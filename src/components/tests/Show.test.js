@@ -6,21 +6,84 @@ import Show from './../Show';
 
 const testShow = {
     //add in approprate test data structure here.
+    name: 'Test Show',
+    seasons: [
+        {
+            id: 0,
+            name: 'Test Season 1',
+            episodes: []
+        },
+        {
+            id: 1,
+            name: 'Test Season 2',
+            episodes: []
+        },
+        {
+            id: 2,
+            name: 'Test Season 3',
+            episodes: []
+        },
+        {
+            id: 3,
+            name: 'Test Season 4',
+            episodes: []
+        },
+    ],
+    summary: 'Test Summary',
 }
 
 test('renders testShow and no selected Season without errors', ()=>{
+    render(<Show show={testShow} selectedSeason={'none'}/>);
 });
 
 test('renders Loading component when prop show is null', () => {
+    render(<Show show={null}/>);
+    
+    const loadingContainer = screen.queryByTestId('loading-container');
+    const showContainer = screen.queryByTestId('show-container');
+
+    expect(loadingContainer).toBeInTheDocument();
+    expect(showContainer).not.toBeInTheDocument();
 });
 
 test('renders same number of options seasons are passed in', ()=>{
+    render(<Show show={testShow} selectedSeason={'none'}/>);
+
+    const seasonDropdown = screen.queryAllByTestId('season-option');
+
+    expect(seasonDropdown).toHaveLength(4);
+    expect(seasonDropdown).not.toHaveLength(0);
+
 });
 
 test('handleSelect is called when an season is selected', () => {
+
+    const handleSelectMock = jest.fn();
+
+    render(
+        <Show show={testShow} selectedSeason={'none'} handleSelect={handleSelectMock}/>
+    )
+
+    const seasonDropdown = screen.queryByLabelText(/select a season/i);
+
+    userEvent.selectOptions(seasonDropdown, ['1']);
+
+    expect(handleSelectMock).toBeCalledTimes(1);
 });
 
 test('component renders when no seasons are selected and when rerenders with a season passed in', () => {
+
+    const { rerender } = render(<Show show={testShow} selectedSeason={'none'}/>);
+    
+    let episodesContainer = screen.queryByTestId('episodes-container');
+
+    expect(episodesContainer).not.toBeInTheDocument();
+
+    rerender(<Show show={testShow} selectedSeason={'1'}/>);
+
+    episodesContainer = screen.queryByTestId('episodes-container');
+
+    expect(episodesContainer).toBeInTheDocument();
 });
 
 //Tasks:
